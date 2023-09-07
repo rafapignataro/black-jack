@@ -1,0 +1,262 @@
+[
+  {
+    "suit": "♥️",
+    "label": "2",
+    "value": 2
+  },
+  {
+    "suit": "♥️",
+    "label": "3",
+    "value": 3
+  },
+  {
+    "suit": "♥️",
+    "label": "4",
+    "value": 4
+  },
+  {
+    "suit": "♥️",
+    "label": "5",
+    "value": 5
+  },
+  {
+    "suit": "♥️",
+    "label": "6",
+    "value": 6
+  },
+  {
+    "suit": "♥️",
+    "label": "7",
+    "value": 7
+  },
+  {
+    "suit": "♥️",
+    "label": "8",
+    "value": 8
+  },
+  {
+    "suit": "♥️",
+    "label": "9",
+    "value": 9
+  },
+  {
+    "suit": "♥️",
+    "label": "10",
+    "value": 10
+  },
+  {
+    "suit": "♥️",
+    "label": "J",
+    "value": 10
+  },
+  {
+    "suit": "♥️",
+    "label": "Q",
+    "value": 10
+  },
+  {
+    "suit": "♥️",
+    "label": "K",
+    "value": 10
+  },
+  {
+    "suit": "♥️",
+    "label": "A",
+    "value": [1, 10]
+  },
+  {
+    "suit": "♦️",
+    "label": "2",
+    "value": 2
+  },
+  {
+    "suit": "♦️",
+    "label": "3",
+    "value": 3
+  },
+  {
+    "suit": "♦️",
+    "label": "4",
+    "value": 4
+  },
+  {
+    "suit": "♦️",
+    "label": "5",
+    "value": 5
+  },
+  {
+    "suit": "♦️",
+    "label": "6",
+    "value": 6
+  },
+  {
+    "suit": "♦️",
+    "label": "7",
+    "value": 7
+  },
+  {
+    "suit": "♦️",
+    "label": "8",
+    "value": 8
+  },
+  {
+    "suit": "♦️",
+    "label": "9",
+    "value": 9
+  },
+  {
+    "suit": "♦️",
+    "label": "10",
+    "value": 10
+  },
+  {
+    "suit": "♦️",
+    "label": "J",
+    "value": 10
+  },
+  {
+    "suit": "♦️",
+    "label": "Q",
+    "value": 10
+  },
+  {
+    "suit": "♦️",
+    "label": "K",
+    "value": 10
+  },
+  {
+    "suit": "♦️",
+    "label": "A",
+    "value": [1, 10]
+  },
+  {
+    "suit": "♣️",
+    "label": "2",
+    "value": 2
+  },
+  {
+    "suit": "♣️",
+    "label": "3",
+    "value": 3
+  },
+  {
+    "suit": "♣️",
+    "label": "4",
+    "value": 4
+  },
+  {
+    "suit": "♣️",
+    "label": "5",
+    "value": 5
+  },
+  {
+    "suit": "♣️",
+    "label": "6",
+    "value": 6
+  },
+  {
+    "suit": "♣️",
+    "label": "7",
+    "value": 7
+  },
+  {
+    "suit": "♣️",
+    "label": "8",
+    "value": 8
+  },
+  {
+    "suit": "♣️",
+    "label": "9",
+    "value": 9
+  },
+  {
+    "suit": "♣️",
+    "label": "10",
+    "value": 10
+  },
+  {
+    "suit": "♣️",
+    "label": "J",
+    "value": 10
+  },
+  {
+    "suit": "♣️",
+    "label": "Q",
+    "value": 10
+  },
+  {
+    "suit": "♣️",
+    "label": "K",
+    "value": 10
+  },
+  {
+    "suit": "♣️",
+    "label": "A",
+    "value": [1, 10]
+  },
+  {
+    "suit": "♠️",
+    "label": "2",
+    "value": 2
+  },
+  {
+    "suit": "♠️",
+    "label": "3",
+    "value": 3
+  },
+  {
+    "suit": "♠️",
+    "label": "4",
+    "value": 4
+  },
+  {
+    "suit": "♠️",
+    "label": "5",
+    "value": 5
+  },
+  {
+    "suit": "♠️",
+    "label": "6",
+    "value": 6
+  },
+  {
+    "suit": "♠️",
+    "label": "7",
+    "value": 7
+  },
+  {
+    "suit": "♠️",
+    "label": "8",
+    "value": 8
+  },
+  {
+    "suit": "♠️",
+    "label": "9",
+    "value": 9
+  },
+  {
+    "suit": "♠️",
+    "label": "10",
+    "value": 10
+  },
+  {
+    "suit": "♠️",
+    "label": "J",
+    "value": 10
+  },
+  {
+    "suit": "♠️",
+    "label": "Q",
+    "value": 10
+  },
+  {
+    "suit": "♠️",
+    "label": "K",
+    "value": 10
+  },
+  {
+    "suit": "♠️",
+    "label": "A",
+    "value": [1, 10]
+  }
+]
