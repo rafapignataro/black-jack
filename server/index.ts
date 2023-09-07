@@ -147,6 +147,10 @@ webSocketServer.on('connection', (socket: Socket, request: Request) => {
           }));
           break;
         }
+        case 'PLAYER_BET': {
+          room.playerBet(data.playerId, data.bet);
+          break;
+        }
         case 'PLAYER_HIT': {
           room.playerHit(data.playerId);
           break;

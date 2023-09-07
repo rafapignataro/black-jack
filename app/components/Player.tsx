@@ -1,20 +1,9 @@
 import { CHAIR_POSITIONS, ChairIndex, Player as PlayerType } from "../App";
 import { Card } from "./Card";
+import { Chip } from "./Chip";
 
 type PlayerProps = {
-  player: {
-    id: string;
-    roomId: string;
-    status: string;
-    cards: Array<{
-      suit: string;
-      label: string;
-      value: number;
-      show: boolean;
-    }>;
-    count: boolean;
-    played: boolean;
-  };
+  player: PlayerType;
   chair: ChairIndex;
   isUser: boolean;
   turnPlayer?: PlayerType;
@@ -58,11 +47,16 @@ export function Player({ player, isUser, chair, turnPlayer, turnEndsIn }: Player
           {turnEndsIn}
         </div>
       )}
-      {/* {roomState.status === 'END' && player.status !== 'IDLE' && player.count && (
-        <div className="absolute left-1/2 -top-1/2 bg-yellow-950 p-2 text-sm font-bold text-yellow-500 rounded-full">
+      {!!player.bet && (
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[125%]">
+          <Chip value={player.bet} />
+        </div>
+      )}
+      {player.status !== 'IDLE' && (
+        <div className="absolute left-1/2 -top-1/2 -translate-x-1/2 -translate-y-1/4 bg-yellow-950 p-1 text-sm font-bold text-yellow-500 rounded-full">
           {player.status}
         </div>
-      ) */}
+      )}
     </div>
   )
 }

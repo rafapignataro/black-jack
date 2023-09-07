@@ -35,7 +35,7 @@ class Dealer {
 
     this.cards.push(card);
 
-    this.count += typeof card.value === 'string' ? card.value : card.value[0];
+    this.count += typeof card.value === 'number' ? card.value : card.value[0];
 
     if (this.count === 21) this.status = 'BLACKJACK';
 
@@ -62,6 +62,10 @@ class Player {
 
   public played: boolean;
 
+  public balance: number;
+
+  public bet: number;
+
   constructor(id: string, roomId: string) {
     this.id = id;
 
@@ -74,20 +78,27 @@ class Player {
     this.count = 0;
 
     this.played = false;
+
+    this.balance = 500;
+
+    this.bet = 0;
   }
 
   public dealCard(card: Card) {
     this.cards.push(card);
 
-    this.count += typeof card.value === 'string' ? card.value : card.value[0];
+    this.count += typeof card.value === 'number' ? card.value : card.value[0];
 
-    if (this.count === 21) this.status = 'BLACKJACK';
+    if (this.count === 21) {
+      this.status = 'BLACKJACK';
+    }
 
-    if (this.count > 21) this.status == 'BUST'
+    if (this.count > 21) {
+      this.status = 'BUST';
+    }
   }
 
   public reset() {
-    console.log('zap')
     this.status = 'IDLE';
 
     this.cards = [];
@@ -95,13 +106,15 @@ class Player {
     this.count = 0;
 
     this.played = false;
+
+    this.bet = 0;
   }
 }
 
 export class Room {
   public id: string;
 
-  public status: 'IDLE' | 'STARTING' | 'DEALING_CARDS' | 'PLAYING' | 'END';
+  public status: 'IDLE' | 'STARTING' | 'BETTING' | 'DEALING_CARDS' | 'PLAYING' | 'END';
 
   public deck: Array<Card>;
 
@@ -187,13 +200,47 @@ export class Room {
 
         this.startsInInterval = undefined;
 
-        this.dealCards();
+        this.receiveBet();
 
         return;
       } 
 
       if (this.startsIn) this.startsIn--;
 
+      this.emitState();
+    }, 1000);
+  }
+
+  receiveBet() {
+    this.status = 'BETTING';
+
+    const playerToReceiveBets = this.listPlayers().filter(player => player) as Array<Player>;
+
+    const playerToReceiveBet = playerToReceiveBets.find(player => !player.bet);
+
+    this.turnPlayer = undefined;
+    this.turnEndsIn = undefined;
+    clearInterval(this.turnEndsInInterval);
+    this.turnEndsInInterval = undefined;
+
+    if (!playerToReceiveBet) {
+      this.dealCards();
+      return;
+    }
+
+    this.turnPlayer = playerToReceiveBet;
+    this.turnEndsIn = 30;
+
+    this.emitState();
+
+    this.turnEndsInInterval = setInterval(() => {
+      if (this.turnEndsIn === 0) {
+        this.receiveBet();
+        return;
+      } 
+
+      if (this.turnEndsIn) this.turnEndsIn--;
+      
       this.emitState();
     }, 1000);
   }
@@ -224,6 +271,7 @@ export class Room {
 
       const receiver = receivers[playerToDeal];
 
+      console.log(card)
       receiver.dealCard(card);
 
       this.emitState();
@@ -256,10 +304,31 @@ export class Room {
     return player;
   }
 
+  playerBet(playerId: string, bet: 25 | 50 | 100 | 500) {
+    const player = Object.values(this.players).find(p => p && p.id === playerId);
+
+    if (!player) return;
+
+    if (!this.turnPlayer || this.turnPlayer.id !== playerId) return;
+
+    const bets = [25, 50, 100, 500];
+
+    if (!bets.includes(bet)) return;
+
+    player.bet = bet;
+    player.balance = player.balance - bet;
+
+    this.receiveBet();
+
+    this.emitState();
+  }
+
   playerHit(playerId: string) {
     const player = Object.values(this.players).find(p => p && p.id === playerId);
 
     if (!player) return;
+
+    if (!this.turnPlayer || this.turnPlayer.id !== playerId) return;
 
     const card = this.deck.pop() as Card;
 
@@ -276,6 +345,8 @@ export class Room {
     const player = Object.values(this.players).find(p => p && p.id === playerId);
 
     if (!player) return;
+
+    if (!this.turnPlayer || this.turnPlayer.id !== playerId) return;
 
     this.nextTurn()
   }
@@ -347,13 +418,49 @@ export class Room {
 
     const players = this.listPlayers();
 
-    if (this.dealer.status === 'BLACKJACK') {
-      for (const player of players) {
-        if (!player) return;
+    console.log('END')
+    console.log('dealer', this.dealer.status);
 
-        if (player.status !== 'BLACKJACK') player.status = 'LOST';
+    players.forEach(player => {
+      if (!player) return;
+      console.log('player', player.id, player.status);
+
+      if (player.status === 'BLACKJACK') {
+        player.bet = 0;
+        player.balance = player.balance + (player.bet * 1.5);
+        return;
       }
-    }
+
+      if (player.status === 'BUST') {
+        player.status = 'LOST';
+        player.bet = 0;
+        return;
+      }
+
+      if (this.dealer.status === 'BLACKJACK') {
+        player.status = 'LOST';
+      }
+
+      if (this.dealer.status === 'BUST') {
+        if (player.status === 'IDLE') {
+          player.status = 'BLACKJACK';
+          player.balance = player.balance + (player.bet * 2);
+        }
+      }
+
+      if (this.dealer.status === 'IDLE') {
+        if (player.status === 'IDLE') {
+          if (player.count > this.dealer.count) {
+            player.status = 'BLACKJACK';
+            player.balance = player.balance + (player.bet * 2);
+          } else {
+            player.status = 'LOST';
+          }
+        }
+      }
+
+      player.bet = 0;
+    });
 
     this.emitState();
 
