@@ -199,7 +199,7 @@ export function App() {
           ) : <Chair key={`chair_${chair}`} chair={chair + 1 as ChairIndex} onPick={onPickChair} disabled={user?.isPlaying} /> )}
         </div>
       </div>
-      <footer className="w-full bg-yellow-950 relative">
+      <footer className="w-full bg-yellow-950 relative h-20">
         <div className="flex items-center justify-center p-4 gap-5">
           {userPlayer && <div className="flex items-center gap-5">
             <div className="flex flex-col">

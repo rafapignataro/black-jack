@@ -16,7 +16,7 @@
         const server_props = JSON.parse(JSON.stringify(<%-JSON.stringify(props)%>));
 
         window.server_props = server_props;
-      })()
+      })();
     </script>
     <% if (production) { %>
       <script type="module" src="<%= app_js %>"></script>
