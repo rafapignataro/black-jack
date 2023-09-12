@@ -62,14 +62,18 @@ class Player {
 
   public played: boolean;
 
-  public balance: number;
-
   public bet: number;
 
-  constructor(id: string, roomId: string) {
-    this.id = id;
+  public user: User;
 
-    this.roomId = roomId;
+  constructor(user: User) {
+    this.id = user.id;
+
+    if (!user.roomId) return;
+
+    this.roomId = user.roomId;
+
+    this.user = user;
 
     this.status = 'IDLE';
 
@@ -78,8 +82,6 @@ class Player {
     this.count = 0;
 
     this.played = false;
-
-    this.balance = 500;
 
     this.bet = 0;
   }
@@ -282,75 +284,6 @@ export class Room {
     }, 1000);
   }
 
-  playerPickChair(user: User, chair: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8) {
-    const spectator = this.spectators.get(user.id);
-
-    if (!spectator) return;
-
-    let player = Object.values(this.players).find(p => p && p.id === user.id);
-
-    if (player) return player;
-
-    this.spectators.delete(user.id);
-
-    user.isPlaying = true;
-
-    player = new Player(user.id, this.id);
-
-    this.players[chair] = player;
-
-    if (this.status === 'IDLE') this.start();
-
-    return player;
-  }
-
-  playerBet(playerId: string, bet: 25 | 50 | 100 | 500) {
-    const player = Object.values(this.players).find(p => p && p.id === playerId);
-
-    if (!player) return;
-
-    if (!this.turnPlayer || this.turnPlayer.id !== playerId) return;
-
-    const bets = [25, 50, 100, 500];
-
-    if (!bets.includes(bet)) return;
-
-    player.bet = bet;
-    player.balance = player.balance - bet;
-
-    this.receiveBet();
-
-    this.emitState();
-  }
-
-  playerHit(playerId: string) {
-    const player = Object.values(this.players).find(p => p && p.id === playerId);
-
-    if (!player) return;
-
-    if (!this.turnPlayer || this.turnPlayer.id !== playerId) return;
-
-    const card = this.deck.pop() as Card;
-
-    player.dealCard(card);
-
-    if (player.status !== 'IDLE') {
-      return this.nextTurn();
-    }
-
-    this.emitState('DEAL_CARD');
-  }
-
-  playerStay(playerId: string) {  
-    const player = Object.values(this.players).find(p => p && p.id === playerId);
-
-    if (!player) return;
-
-    if (!this.turnPlayer || this.turnPlayer.id !== playerId) return;
-
-    this.nextTurn()
-  }
-
   nextTurn() {
     this.status = 'PLAYING';
 
@@ -400,9 +333,9 @@ export class Room {
 
     if (dealerSecondCard) dealerSecondCard._show();
 
-    this.emitState();
-
     await sleep();
+
+    this.emitState();
 
     if (this.dealer.count <= 16) {
       while (this.dealer.count <= 16) {
@@ -428,17 +361,18 @@ export class Room {
       if (!player) return;
 
       const playerBet = player.bet;
+      const playerBalance = player.user.balance;
 
       player.bet = 0;
 
       if (player.status === 'BLACKJACK' && this.dealer.status === 'BLACKJACK') {
-        player.balance = player.balance + playerBet;
+        player.user.balance = playerBalance + playerBet;
         player.status = 'STAND-OFF';
         return;
       }
 
       if (player.status === 'BLACKJACK' && (this.dealer.status === 'BUST' || this.dealer.status === 'IDLE')) {
-        player.balance = player.balance + (playerBet * 2);
+        player.user.balance = playerBalance + (playerBet * 2);
         player.status = 'WON';
         return;
       }
@@ -449,7 +383,7 @@ export class Room {
       }
 
       if (player.status === 'IDLE' && this.dealer.status === 'BUST') {
-        player.balance = player.balance + (playerBet * 2);
+        player.user.balance = playerBalance + (playerBet * 2);
         player.status = 'WON';
         return;
       }
@@ -457,7 +391,7 @@ export class Room {
       if (player.status === 'IDLE' && this.dealer.status === 'IDLE') {
         if (player.count === this.dealer.count) {
           player.status = 'IDLE';
-          player.balance = player.balance + playerBet;
+          player.user.balance = playerBalance + playerBet;
           
           return;
         }
@@ -469,7 +403,7 @@ export class Room {
           return;
         }
 
-        player.balance = player.balance + (playerBet * 2);
+        player.user.balance = playerBalance + (playerBet * 2);
         player.status = 'WON';
 
         return;
@@ -479,6 +413,77 @@ export class Room {
     this.emitState();
 
     setTimeout(() => this.start(), 5000);
+  }
+
+  playerPickChair(user: User, chair: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8) {
+    const spectator = this.spectators.get(user.id);
+
+    if (!spectator) return;
+
+    let player = Object.values(this.players).find(p => p && p.id === user.id);
+
+    if (player) return player;
+
+    this.spectators.delete(user.id);
+
+    user.isPlaying = true;
+
+    player = new Player(user);
+
+    this.players[chair] = player;
+
+    if (this.status === 'IDLE') this.start();
+
+    this.emitState();
+
+    return player;
+  }
+
+  playerBet(playerId: string, bet: 25 | 50 | 100 | 500) {
+    const player = Object.values(this.players).find(p => p && p.id === playerId);
+
+    if (!player) return;
+
+    if (!this.turnPlayer || this.turnPlayer.id !== playerId) return;
+
+    const bets = [25, 50, 100, 500];
+
+    if (!bets.includes(bet)) return;
+
+    player.bet = bet;
+    player.user.balance = player.user.balance - bet;
+
+    this.receiveBet();
+
+    this.emitState();
+  }
+
+  playerHit(playerId: string) {
+    const player = Object.values(this.players).find(p => p && p.id === playerId);
+
+    if (!player) return;
+
+    if (!this.turnPlayer || this.turnPlayer.id !== playerId) return;
+
+    const card = this.deck.pop() as Card;
+
+    player.dealCard(card);
+
+    if (player.status !== 'IDLE') {
+      return this.nextTurn();
+    }
+
+    this.emitState('DEAL_CARD');
+  }
+
+  playerStay(playerId: string) {  
+    const player = Object.values(this.players).find(p => p && p.id === playerId);
+
+    if (!player) return;
+
+    if (!this.turnPlayer || this.turnPlayer.id !== playerId) return;
+
+    this.nextTurn()
   }
 
   state() {
@@ -495,11 +500,14 @@ export class Room {
   }
 
   public emitState(ref?: string) {
-    webSocketServer.clients.forEach((client: Socket) => {
-      // TODO: Send event just for room
-      if (!client.userId || client.readyState !== WebSocket.OPEN) return;
+    webSocketServer.clients.forEach((socket: Socket) => {
+      if (
+        !socket.userId ||
+        socket.roomId !== this.id || 
+        socket.readyState !== WebSocket.OPEN
+      ) return;
 
-      client.send(JSON.stringify({
+      socket.send(JSON.stringify({
         event: 'ROOM_STATE',
         data: {
           state: this.state(),

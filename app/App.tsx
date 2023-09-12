@@ -4,9 +4,18 @@ import { Dealer } from "./components/Dealer";
 import { Chair } from "./components/Chair";
 import { Chip } from "./components/Chip";
 
+type User = {
+  id: string;
+  roomId?: string
+  online: boolean;
+  isPlaying: boolean;
+  balance: number;
+}
+
 export type Player = {
   id: string;
   roomId: string;
+  user: User;
   status: string;
   cards: Array<{
     suit: string;
@@ -16,7 +25,6 @@ export type Player = {
   }>;
   count: boolean;
   played: boolean;
-  balance: number;
   bet: 25 | 50 | 100 | 500;
 }
 
@@ -53,13 +61,6 @@ type ChairPosition = {
   y?: number | string;
 }
 
-type User = {
-  id: string;
-  roomId?: string
-  online: boolean;
-  isPlaying: boolean;
-}
-
 export const CHAIR_POSITIONS: Record<ChairIndex, ChairPosition> = {
   1: { top: '50%', left: 0, x: '-75%', y: '-50%' },
   2: { bottom: '15%', left: 0, x: '50%', y: '50%' },
@@ -90,11 +91,24 @@ audios.dealCard.playbackRate = 2;
 export function App() {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const { roomId } = window.server_props as { production: boolean; userId: string; roomId: string;};
+  const { userId, roomId } = window.server_props as { production: boolean; userId: string; roomId: string;};
 
-  const [user, setUser] = useState<User | null>(null);
   const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [websocket, setWebsocket] = useState<WebSocket | null>(null);
+
+  const user = (() => {
+    if (!roomState) return null;
+
+    const player = roomState.players.find(p => p && p.id === userId);
+
+    if (player) return player.user;
+
+    const spectactor = roomState.spectators.find(s => s.id === userId);
+
+    if (spectactor) return spectactor;
+
+    return null;
+  })();
 
   useEffect(() => {
     const { location } = window;
@@ -121,10 +135,6 @@ export function App() {
         console.info('--------------------------------')
 
         switch (event) {
-          case 'USER_STATE': {
-            setUser(data.user)
-            break;
-          }
           case 'ROOM_STATE': {
             setRoomState(data.state);
 
@@ -186,7 +196,6 @@ export function App() {
 
   const disableActions = !websocket || !user?.isPlaying || roomState.turnPlayer?.id !== user?.id; 
 
-  const userPlayer = roomState.players.find(p => p && p.id === user?.id);
   const playerTurn = roomState.turnPlayer?.id === user?.id;
 
   return (
@@ -198,15 +207,13 @@ export function App() {
               <span className="text-yellow-600 font-bold text-sm -mb-1">ROOM</span>
               <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">#</span>{roomId}</h1>
             </div>
-            {userPlayer && (
-              <div className="flex flex-col text-right">
-                <span className="text-yellow-600 font-bold text-sm -mb-1">BALANCE</span>
-                <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">$</span>{Number(userPlayer.balance).toFixed(2)}</h1>
-              </div>
-            )}
+            <div className="flex flex-col text-right">
+              <span className="text-yellow-600 font-bold text-sm -mb-1">BALANCE</span>
+              <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">$</span>{Number(user?.balance).toFixed(2)}</h1>
+            </div>
           </div>
         </header>
-        <div id="table" className="bg-green-900 h-full w-full border-[24px] rounded-[32px] rounded-bl-[50%] rounded-br-[50%] border-yellow-950 relative">
+        <div id="table" className="bg-green-900 shadow-2xl h-full w-full border-[24px] rounded-[32px] rounded-bl-[50%] rounded-br-[50%] border-yellow-950 relative">
           <h2 className="z-40 absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-3xl text-center">
             {ROOM_STATUS_LABELS[roomState.status]} {!!roomState.startsIn && roomState.startsIn}
           </h2>

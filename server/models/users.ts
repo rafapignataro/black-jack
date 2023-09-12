@@ -7,12 +7,16 @@ export class User {
 
   public isPlaying: boolean;
 
+  public balance: number;
+
   constructor() {
     this.id = crypto.randomUUID();
 
     this.online = false;
 
     this.isPlaying = false;
+
+    this.balance = 500;
   }
 
   connect() {

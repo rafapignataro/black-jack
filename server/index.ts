@@ -11,6 +11,7 @@ import { User } from './models/users';
 
 export interface Socket extends WebSocket {
   userId?: string;
+  roomId?: string;
 }
 
 export const gameServer = new GameServer();
@@ -18,6 +19,7 @@ export const gameServer = new GameServer();
 const app = express();
 const server = http.createServer(app);
 export const webSocketServer = new WebSocket.Server({ server });
+const sockets = new Map<string, Socket>();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -113,16 +115,14 @@ webSocketServer.on('connection', (socket: Socket, request: Request) => {
   const room = gameServer.rooms.find(user.roomId);
   if (!room) return;
 
+  sockets.set(user.id, socket);
+
   user.connect();
 
   console.info(chalk.green('CONNECTED USER: '), userId);
 
   socket.userId = user.id;
-
-  socket.send(JSON.stringify({
-    event: 'USER_STATE',
-    data: { user }
-  }));
+  socket.roomId = user.roomId;
 
   room.emitState();
 
@@ -143,11 +143,6 @@ webSocketServer.on('connection', (socket: Socket, request: Request) => {
       switch (event) {
         case 'USER_PICK_CHAIR': {
           room.playerPickChair(user, data.chair);
-
-          socket.send(JSON.stringify({
-            event: 'USER_STATE',
-            data: { user }
-          }));
           break;
         }
         case 'PLAYER_BET': {
@@ -173,6 +168,8 @@ webSocketServer.on('connection', (socket: Socket, request: Request) => {
 
   socket.on('close', () => {
     user.disconnect();
+
+    sockets.set(user.id, socket);
 
     room.emitState();
   });
