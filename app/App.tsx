@@ -83,6 +83,8 @@ export const audios = {
   chip: new Audio('/sounds/chip.mp3'),
   dealCard: new Audio('/sounds/deal-card.mp3'),
   timerClock: new Audio('/sounds/timer-clock.mp3'),
+  winner: new Audio('/sounds/winner.mp3'),
+  looser: new Audio('/sounds/looser.mp3'),
 }
 
 audios.timerClock.volume = 0.6;

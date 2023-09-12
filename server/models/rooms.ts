@@ -293,10 +293,13 @@ export class Room {
 
     if (lastTurnPlayer) lastTurnPlayer.played = true;
 
+    this.turnPlayer = undefined;
     this.turnEndsIn = undefined;
     clearInterval(this.turnEndsInInterval)
     this.turnEndsInInterval = undefined;
-    
+
+    this.emitState();
+
     const currentTurnPlayer = players.find(p => p && !p.played);
 
     if (!currentTurnPlayer) {
@@ -311,7 +314,7 @@ export class Room {
 
     this.turnPlayer = currentTurnPlayer;
 
-    this.turnEndsIn = 20;
+    this.turnEndsIn = 30;
 
     this.emitState();
 
@@ -483,7 +486,7 @@ export class Room {
 
     if (!this.turnPlayer || this.turnPlayer.id !== playerId) return;
 
-    this.nextTurn()
+    this.nextTurn();
   }
 
   state() {

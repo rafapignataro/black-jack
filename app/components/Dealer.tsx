@@ -29,8 +29,11 @@ export function Dealer({ dealer }: DealerProps) {
       <span className="font-bold text-white text-sm">
         DEALER
       </span>
-      <div className="absolute -bottom-1/4 left-1/2 flex items-center gap-4">
-        {dealer.cards.map((card) => <Card key={`${card.label}_${card.suit}`} card={card} />)}
+      <div className="absolute -bottom-1/4 left-1/3 flex items-end gap-4">
+        {!!dealer.count && <span className="text-sm font-bold text-white">{dealer.count}</span>}
+        <div className="flex items-center">
+          {dealer.cards.map((card, index) => <Card key={`${card.label}_${card.suit}`} card={card} index={index} />)}
+        </div>
       </div>
     </div>
   )

@@ -31,6 +31,11 @@ export function Player({ player, isUser, chair, turnPlayer, turnEndsIn }: Player
     turnPlayer && isUser ? audios.timerClock.play() : audios.timerClock.pause();
   }, [turnPlayer]);
 
+  useEffect(() => {
+    if (player.status === 'WON') audios.winner.play();
+    if (player.status === 'LOST') audios.looser.play();
+  }, [player.status]);
+
   return (
     <div 
       className={`absolute flex justify-center items-center rounded-full w-24 h-24 border-4 ${style} `}
@@ -45,8 +50,11 @@ export function Player({ player, isUser, chair, turnPlayer, turnEndsIn }: Player
       <span className="font-bold text-white text-sm">
         {label}
       </span>
-      <div className="absolute -bottom-1/2 left-1/2 flex items-center gap-4">
-        {player.cards.map((card) => <Card key={`${card.label}_${card.suit}`} card={card} />)}
+      <div className="absolute -bottom-1/2 left-1/3 flex items-end gap-4">
+        {!!player.count && <span className="text-sm font-bold text-white">{player.count}</span>}
+        <div className="flex items-center">
+          {player.cards.map((card, index) => <Card key={`${card.label}_${card.suit}`} card={card} index={index} />)}
+        </div>
       </div>
       {turnPlayer && (
         <div className="absolute left-1/2 top-1/4 -translate-x-1/2 -translate-y-1/2 text-white text-lg font-bold">
