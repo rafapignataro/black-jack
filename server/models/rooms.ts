@@ -54,7 +54,7 @@ class Player {
 
   public roomId: string;
 
-  public status: 'IDLE' | 'BUST' | 'BLACKJACK' | 'LOST';
+  public status: 'IDLE' | 'BUST' | 'BLACKJACK' | 'LOST' | 'WON' | 'STAND-OFF';
 
   public cards: Array<Card>;
 
@@ -274,7 +274,7 @@ export class Room {
       console.log(card)
       receiver.dealCard(card);
 
-      this.emitState();
+      this.emitState('DEAL_CARD');
 
       playerToDeal++;
 
@@ -338,7 +338,7 @@ export class Room {
       return this.nextTurn();
     }
 
-    this.emitState();
+    this.emitState('DEAL_CARD');
   }
 
   playerStay(playerId: string) {  
@@ -405,9 +405,15 @@ export class Room {
     await sleep();
 
     if (this.dealer.count <= 16) {
-      const card = this.deck.pop() as Card;
+      while (this.dealer.count <= 16) {
+        const card = this.deck.pop() as Card;
 
-      this.dealer.dealCard(card);
+        this.dealer.dealCard(card);
+
+        await sleep();
+
+        this.emitState('DEAL_CARD');
+      }
     }
 
     this.status = 'END';
@@ -418,53 +424,61 @@ export class Room {
 
     const players = this.listPlayers();
 
-    console.log('END')
-    console.log('dealer', this.dealer.status);
-
     players.forEach(player => {
       if (!player) return;
-      console.log('player', player.id, player.status);
 
-      if (player.status === 'BLACKJACK') {
-        player.bet = 0;
-        player.balance = player.balance + (player.bet * 1.5);
+      const playerBet = player.bet;
+
+      player.bet = 0;
+
+      if (player.status === 'BLACKJACK' && this.dealer.status === 'BLACKJACK') {
+        player.balance = player.balance + playerBet;
+        player.status = 'STAND-OFF';
+        return;
+      }
+
+      if (player.status === 'BLACKJACK' && (this.dealer.status === 'BUST' || this.dealer.status === 'IDLE')) {
+        player.balance = player.balance + (playerBet * 2);
+        player.status = 'WON';
         return;
       }
 
       if (player.status === 'BUST') {
         player.status = 'LOST';
-        player.bet = 0;
         return;
       }
 
-      if (this.dealer.status === 'BLACKJACK') {
-        player.status = 'LOST';
+      if (player.status === 'IDLE' && this.dealer.status === 'BUST') {
+        player.balance = player.balance + (playerBet * 2);
+        player.status = 'WON';
+        return;
       }
 
-      if (this.dealer.status === 'BUST') {
-        if (player.status === 'IDLE') {
-          player.status = 'BLACKJACK';
-          player.balance = player.balance + (player.bet * 2);
+      if (player.status === 'IDLE' && this.dealer.status === 'IDLE') {
+        if (player.count === this.dealer.count) {
+          player.status = 'IDLE';
+          player.balance = player.balance + playerBet;
+          
+          return;
         }
-      }
 
-      if (this.dealer.status === 'IDLE') {
-        if (player.status === 'IDLE') {
-          if (player.count > this.dealer.count) {
-            player.status = 'BLACKJACK';
-            player.balance = player.balance + (player.bet * 2);
-          } else {
-            player.status = 'LOST';
-          }
+        const playerWon = player.count > this.dealer.count;
+
+        if (!playerWon) {
+          player.status = 'LOST';
+          return;
         }
-      }
 
-      player.bet = 0;
+        player.balance = player.balance + (playerBet * 2);
+        player.status = 'WON';
+
+        return;
+      }
     });
 
     this.emitState();
 
-    setTimeout(() => this.start(), 10000);
+    setTimeout(() => this.start(), 5000);
   }
 
   state() {
@@ -480,17 +494,17 @@ export class Room {
     }
   }
 
-  public emitState() {
+  public emitState(ref?: string) {
     webSocketServer.clients.forEach((client: Socket) => {
       // TODO: Send event just for room
-      if (
-        !client.userId ||
-        client.readyState !== WebSocket.OPEN
-      ) return;
+      if (!client.userId || client.readyState !== WebSocket.OPEN) return;
 
       client.send(JSON.stringify({
         event: 'ROOM_STATE',
-        data: this.state()
+        data: {
+          state: this.state(),
+          ref
+        }
       }));
     });
   }

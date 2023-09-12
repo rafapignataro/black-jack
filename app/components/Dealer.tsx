@@ -19,7 +19,7 @@ export function Dealer({ dealer }: DealerProps) {
 
   return (
     <div 
-      className={`player absolute flex justify-center items-center rounded-full w-24 h-24 border-4 bg-indigo-600 border-indigo-800`}
+      className={`player absolute flex justify-center items-center rounded-full w-32 h-32 border-4 bg-indigo-600 border-indigo-800`}
       style={{
         top: position.top, 
         left: position.left, 
@@ -29,7 +29,7 @@ export function Dealer({ dealer }: DealerProps) {
       <span className="font-bold text-white text-sm">
         DEALER
       </span>
-      <div className="absolute -bottom-1/2 left-1/2 flex items-center gap-4">
+      <div className="absolute -bottom-1/4 left-1/2 flex items-center gap-4">
         {dealer.cards.map((card) => <Card key={`${card.label}_${card.suit}`} card={card} />)}
       </div>
     </div>

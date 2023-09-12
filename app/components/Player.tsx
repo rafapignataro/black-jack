@@ -1,6 +1,8 @@
-import { CHAIR_POSITIONS, ChairIndex, Player as PlayerType } from "../App";
+import { useEffect } from "react";
+import { CHAIR_POSITIONS, ChairIndex, Player as PlayerType, audios } from "../App";
 import { Card } from "./Card";
 import { Chip } from "./Chip";
+import { PlayerTimer } from "./ProgressBar";
 
 type PlayerProps = {
   player: PlayerType;
@@ -25,9 +27,13 @@ export function Player({ player, isUser, chair, turnPlayer, turnEndsIn }: Player
 
   const position = CHAIR_POSITIONS[chair];
 
+  useEffect(() => {
+    turnPlayer && isUser ? audios.timerClock.play() : audios.timerClock.pause();
+  }, [turnPlayer]);
+
   return (
     <div 
-      className={`absolute flex justify-center items-center rounded-full w-24 h-24 border-4 ${style}`}
+      className={`absolute flex justify-center items-center rounded-full w-24 h-24 border-4 ${style} `}
       style={{
         top: position.top, 
         bottom: position.bottom, 
@@ -48,15 +54,16 @@ export function Player({ player, isUser, chair, turnPlayer, turnEndsIn }: Player
         </div>
       )}
       {!!player.bet && (
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[125%]">
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[150%]">
           <Chip value={player.bet} />
         </div>
       )}
       {player.status !== 'IDLE' && (
-        <div className="absolute left-1/2 -top-1/2 -translate-x-1/2 -translate-y-1/4 bg-yellow-950 p-1 text-sm font-bold text-yellow-500 rounded-full">
+        <div className="absolute left-1/2 -top-1/2 -translate-x-1/2 -translate-y-1/4 bg-yellow-950 p-2 text-sm font-bold text-yellow-400 rounded-full">
           {player.status}
         </div>
       )}
+      {turnPlayer && <PlayerTimer className="absolute -z-10 rounded-full transition-all duration-150" size={108} value={30 - (turnEndsIn ?? 0)} max={30} />}
     </div>
   )
 }

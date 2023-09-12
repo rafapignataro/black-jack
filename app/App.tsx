@@ -61,12 +61,12 @@ type User = {
 }
 
 export const CHAIR_POSITIONS: Record<ChairIndex, ChairPosition> = {
-  1: { top: 0, left: 0, x: '-25%', y: '25%' },
-  2: { bottom: 0, left: 0, x: '-25%', y: '-25%' },
-  3: { bottom: 0, right: '50%', x: '-75%', y: '50%' },
-  4: { bottom: 0, left: '50%', x: '75%', y: '50%' },
-  5: { bottom: 0, right: 0, x: '25%', y: '-25%' },
-  6: { top: 0, right: 0, x: '25%', y: '25%' },
+  1: { top: '50%', left: 0, x: '-75%', y: '-50%' },
+  2: { bottom: '15%', left: 0, x: '50%', y: '50%' },
+  3: { bottom: 0, right: '50%', x: '-100%', y: '50%' },
+  4: { bottom: 0, left: '50%', x: '100%', y: '50%' },
+  5: { bottom: '15%', right: 0, x: '-50%', y: '50%' },
+  6: { top: '50%', right: 0, x: '75%', y: '-50%' },
 };
 
 const ROOM_STATUS_LABELS: Record<RoomState['status'], string>  = {
@@ -78,6 +78,15 @@ const ROOM_STATUS_LABELS: Record<RoomState['status'], string>  = {
   END: 'RESULTS'
 }
 
+export const audios = {
+  chip: new Audio('/sounds/chip.mp3'),
+  dealCard: new Audio('/sounds/deal-card.mp3'),
+  timerClock: new Audio('/sounds/timer-clock.mp3'),
+}
+
+audios.timerClock.volume = 0.6;
+audios.dealCard.playbackRate = 2;
+
 export function App() {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -88,7 +97,11 @@ export function App() {
   const [websocket, setWebsocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:2500');
+    const { location } = window;
+
+    const wssProtocol = location.protocol.includes('https') ? 'wss' : 'ws';
+
+    const ws = new WebSocket(`${wssProtocol}://${location.host}`);
 
     ws.onopen = () => {
       console.info('CONNECTED TO SOCKET');
@@ -113,7 +126,14 @@ export function App() {
             break;
           }
           case 'ROOM_STATE': {
-            setRoomState(data);
+            setRoomState(data.state);
+
+            switch(data.ref) {
+              case 'DEAL_CARD': {
+                audios.dealCard.play();
+                break;
+              }
+            }
           }
         }
 
@@ -158,7 +178,7 @@ export function App() {
 
   if (!roomState) {
     return (
-      <h2 className="z-20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-3xl text-center">
+      <h2 className="z-20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-3xl text-center text-yellow-950">
         CONNECTING...
       </h2>
     )
@@ -167,31 +187,67 @@ export function App() {
   const disableActions = !websocket || !user?.isPlaying || roomState.turnPlayer?.id !== user?.id; 
 
   const userPlayer = roomState.players.find(p => p && p.id === user?.id);
+  const playerTurn = roomState.turnPlayer?.id === user?.id;
 
   return (
     <div className="flex flex-col justify-center items-center h-screen w-full">
-      <header className="w-full bg-yellow-950 relative">
-        <div className="flex items-center justify-between px-4 py-2">
-          <div className="flex flex-col">
-            <span className="text-yellow-800 font-semibold">ROOM</span>
-            <h1 className="text-3xl font-black text-yellow-600"><span className="select-none">#</span>{roomId}</h1>
+      <div className="flex flex-col w-[1024px] h-[640px]">
+        <header className="w-full relative">
+          <div className="flex items-center justify-between px-4 py-2 container mx-auto">
+            <div className="flex flex-col">
+              <span className="text-yellow-600 font-bold text-sm -mb-1">ROOM</span>
+              <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">#</span>{roomId}</h1>
+            </div>
+            {userPlayer && (
+              <div className="flex flex-col text-right">
+                <span className="text-yellow-600 font-bold text-sm -mb-1">BALANCE</span>
+                <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">$</span>{Number(userPlayer.balance).toFixed(2)}</h1>
+              </div>
+            )}
           </div>
-          <span className="z-50 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl text-yellow-900 font-bold text-center">
-            ♥️ ♣️ BLACKJACK ♦️ ♠️
-          </span>
-        </div>
-      </header>
-      <div className="flex items-center justify-cente flex-1 relative">
-        <h2 className="z-40 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-3xl text-center">
-          {ROOM_STATUS_LABELS[roomState.status]} {!!roomState.startsIn && roomState.startsIn}
-        </h2>
-        <div id="table" className="bg-green-900 w-[800px] h-[400px] border-[16px] rounded-full border-yellow-700 relative">
+        </header>
+        <div id="table" className="bg-green-900 h-full w-full border-[24px] rounded-[32px] rounded-bl-[50%] rounded-br-[50%] border-yellow-950 relative">
+          <h2 className="z-40 absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-3xl text-center">
+            {ROOM_STATUS_LABELS[roomState.status]} {!!roomState.startsIn && roomState.startsIn}
+          </h2>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pb-4 gap-5">
+            {playerTurn && roomState.status === 'PLAYING' && <div className="flex flex-col items-center justify-center gap-4">
+              <h3 className="text-2xl font-bold text-white">It's your turn!</h3>
+              <div className="flex items-center gap-5">
+                <button 
+                  className="bg-emerald-500 border-2 border-emerald-600 hover:bg-emerald-600 flex flex-col items-center rounded-md text-white font-bold text-md w-20 h-14 cursor-pointer text-center"
+                  disabled={roomState.status !== 'PLAYING' || disableActions}
+                  onClick={() => handleAction('PLAYER_HIT')}
+                >
+                  <span>+</span>
+                  HIT
+                </button>
+                <button 
+                  className="bg-red-500 border-2 border-red-600 hover:bg-red-600 flex flex-col items-center rounded-md text-white font-bold text-md w-20 h-14 cursor-pointer text-center"
+                  disabled={roomState.status !== 'PLAYING' || disableActions}
+                  onClick={() => handleAction('PLAYER_STAY')}
+                >
+                  <span>-</span>
+                  STAND
+                </button>
+              </div>
+            </div>}
+            {playerTurn && roomState.status === 'BETTING' && <div className="flex flex-col items-center justify-center gap-4">
+              <h3 className="text-2xl font-bold text-white">Your turn to bet!</h3>
+              <div className="flex items-center gap-5">
+                <Chip value={25} onBet={handleBet} />
+                <Chip value={50} onBet={handleBet} />
+                <Chip value={100} onBet={handleBet} />
+                <Chip value={500} onBet={handleBet} />
+              </div>
+            </div>}
+          </div>
           <Dealer dealer={roomState.dealer} />
           {roomState.players && roomState.players.map((player, chair) => player ? (
             <Player 
               key={player.id} 
               player={player} 
-              isUser={false} 
+              isUser={player.id === user?.id} 
               chair={chair + 1 as 1 | 2 | 3 | 4 | 5 | 6}
               turnPlayer={roomState.turnPlayer?.id === player.id ? roomState.turnPlayer : undefined}
               turnEndsIn={roomState.turnPlayer?.id === player.id ? roomState.turnEndsIn : undefined}
@@ -199,34 +255,7 @@ export function App() {
           ) : <Chair key={`chair_${chair}`} chair={chair + 1 as ChairIndex} onPick={onPickChair} disabled={user?.isPlaying} /> )}
         </div>
       </div>
-      <footer className="w-full bg-yellow-950 relative h-20">
-        <div className="flex items-center justify-center p-4 gap-5">
-          {userPlayer && <div className="flex items-center gap-5">
-            <div className="flex flex-col">
-              <span className="text-yellow-800 font-semibold text-sm -mb-1">BALANCE</span>
-              <h1 className="text-2xl font-black text-yellow-600"><span className="select-none">$</span>{Number(userPlayer.balance).toFixed(2)}</h1>
-            </div>
-            <button 
-              className="bg-amber-500 border-2 border-amber-600 hover:bg-amber-400 rounded-full text-white font-bold px-4 py-2 text-xl w-24 disabled:bg-amber-700 disabled:border-amber-800 disabled:text-zinc-300"
-              disabled={roomState.status !== 'PLAYING' || disableActions}
-              onClick={() => handleAction('PLAYER_HIT')}
-            >
-              HIT
-            </button>
-            <button 
-              className="bg-amber-500 border-2 border-amber-600 hover:bg-amber-400 rounded-full text-white font-bold px-4 py-2 text-xl w-24 disabled:bg-amber-700 disabled:border-amber-800 disabled:text-zinc-300"
-              disabled={roomState.status !== 'PLAYING' || disableActions}
-              onClick={() => handleAction('PLAYER_STAY')}
-            >
-              STAY
-            </button>
-            <Chip value={25} onBet={handleBet} />
-            <Chip value={50} onBet={handleBet} />
-            <Chip value={100} onBet={handleBet} />
-            <Chip value={500} onBet={handleBet} />
-          </div>}
-        </div>
-      </footer>
+      
     </div>
   )
 }

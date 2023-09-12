@@ -59,8 +59,11 @@ app.get("/:roomId?", async (request, response) => {
         
         console.info(chalk.green('NEW USER CREATED: '), user.id);
 
-        response.setHeader('Set-Cookie', `_id_=${user.id}`);
-
+        response.cookie('_id_', user.id, {
+          maxAge: 1000 * 60 * 60 * 24 * 365, // 1 Year,
+          httpOnly: true,
+          sameSite: true,
+        })
         return user;
       }
 
@@ -88,7 +91,7 @@ app.get("/:roomId?", async (request, response) => {
   
     response.render("index.ejs", { 
       app_js: `/build/${manifest['app/index.tsx'].file}`,
-      app_css: `/build/${manifest['app/main.css'].file}`,
+      app_css: `/build/${manifest['app/index.css'].file}`,
       production,
       props
     });
