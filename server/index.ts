@@ -175,31 +175,6 @@ webSocketServer.on('connection', (socket: Socket, request: Request) => {
   });
 });
 
-// // PAGES
-// app.get('/:roomId', (request, response) => {  
-//   const roomId = request.params.roomId;
-
-//   if (!roomId) return response.redirect('/home');
-
-//   const room = gameServer.rooms.find(roomId);
-
-//   if (!room) return;
-
-//   const userId = getUserIdFromRequest(request);
-
-//   console.info(chalk.blue('ENTERING ROOM: '), userId ?? 'NEW USER');
-
-//   if (!userId || !gameServer.users.find(userId)) {
-//     const user = gameServer.users.create();
-
-//     console.info(chalk.green('NEW USER CREATED: '), user.id);
-
-//     response.setHeader('Set-Cookie', `_id_=${user.id}`);
-//   }
-
-//   response.sendFile(path.join(__dirname, 'views/room.html'));
-// });
-
 // app.post('/rooms', (request, response) => {
 //   const userId = getUserIdFromRequest(request);
 
@@ -214,4 +189,4 @@ webSocketServer.on('connection', (socket: Socket, request: Request) => {
 
 const PORT = process.env.PORT || 2500;
 
-server.listen(PORT, () => console.info('SERVER ON: ', PORT))
+server.listen(PORT, () => console.info(`\n\x1b[36m~ SERVER: http://localhost:\x1b[1m${PORT}/\x1b[0m`))
