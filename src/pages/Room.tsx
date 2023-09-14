@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { Player } from "./Player";
-import { Dealer } from "./Dealer";
-import { Chair } from "./Chair";
-import { Chip } from "./Chip";
+import { Player } from "../components/Player";
+import { Dealer } from "../components/Dealer";
+import { Chair } from "../components/Chair";
+import { Chip } from "../components/Chip";
+import { useServerProps } from "../App";
 
 type User = {
   id: string;
@@ -92,9 +93,7 @@ audios.timerClock.volume = 0.6;
 audios.dealCard.playbackRate = 2;
 
 export function Room() {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const { userId, roomId } = window.__SERVER_PROPS__ as { production: boolean; userId: string; roomId: string;};
+  const { userId, roomId } = useServerProps<{ production: boolean; userId: string; roomId: string; }>();
 
   const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [websocket, setWebsocket] = useState<WebSocket | null>(null);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Room } from "./components/Room";
+
+import { Room } from "./pages/Room";
 
 import './tailwind.css';
 
@@ -7,8 +8,8 @@ export function App() {
   return <Room />
 }
 
-export function useServerProps() {
-  const [props, setProps] = useState();
+export function useServerProps<T>() {
+  const [props, setProps] = useState<T>({} as T);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -16,5 +17,5 @@ export function useServerProps() {
     setProps(window.__SERVER_PROPS__);
   }, []);
 
-  return { props };
+  return props;
 }

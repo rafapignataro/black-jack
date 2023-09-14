@@ -1,4 +1,4 @@
-import { CHAIR_POSITIONS, ChairIndex } from "./Room";
+import { CHAIR_POSITIONS, ChairIndex } from "../pages/Room";
 
 type ChairProps = {
   chair: ChairIndex;

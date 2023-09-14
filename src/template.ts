@@ -21,8 +21,8 @@ export default function template({ body, title, production, bundle, props }: Tem
         <div id="root">${body}</div>
         <script>window.__SERVER_PROPS__ = ${JSON.stringify(props || {})}</script>
         ${production ? `<script src="/build/${bundle?.js}"></script>` : ''}
-        ${!production ? `
-          <script type="module">
+        ${!production ? 
+          `<script type="module">
             import RefreshRuntime from 'http://localhost:5173/@react-refresh'
             RefreshRuntime.injectIntoGlobalHook(window)
             window.$RefreshReg$ = () => {}
@@ -30,8 +30,7 @@ export default function template({ body, title, production, bundle, props }: Tem
             window.__vite_plugin_react_preamble_installed__ = true
           </script>
           <script type="module" src="http://localhost:5173/@vite/client"></script>
-          <script type="module" src="http://localhost:5173/src/client.tsx"></script>
-        ` : ''}
+          <script type="module" src="http://localhost:5173/src/client.tsx"></script>` : ''}
       </body>
     </html>
   `;

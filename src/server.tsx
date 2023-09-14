@@ -68,6 +68,8 @@ app.get("/:roomId?", async (request, response) => {
       userId: user.id
     }
 
+    response.setHeader('Content-Type', 'text/html')
+
     if (!production) {
       return response.send(template({
         body: '',
