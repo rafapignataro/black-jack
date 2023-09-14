@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development concurrently 'vite dev' 'tsup --watch --onSuccess \"node build/index.cjs\"'",
+    "server": "tsup --watch --onSuccess \"node build/server.cjs\"",
+    "dev": "NODE_ENV=development concurrently 'vite dev' 'tsup --watch --onSuccess \"node build/server.cjs\"'",
     "build": "concurrently 'vite build' 'tsup'",
-    "start": "NODE_ENV=production node build/index.cjs"
+    "start": "NODE_ENV=production node build/server.cjs"
   },
   "dependencies": {
     "chalk": "^4.1.2",

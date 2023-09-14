@@ -1,5 +1,5 @@
-import cards from "../../cards.json";
-import { Card } from "../models/card";
+import cards from "../../../cards.json";
+import { Card } from "../classes/card";
 
 export function getShuffledDeck() {
   const deck = cards as Array<Card>;

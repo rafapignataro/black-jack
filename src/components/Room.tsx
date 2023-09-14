@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Player } from "./components/Player";
-import { Dealer } from "./components/Dealer";
-import { Chair } from "./components/Chair";
-import { Chip } from "./components/Chip";
+
+import { Player } from "./Player";
+import { Dealer } from "./Dealer";
+import { Chair } from "./Chair";
+import { Chip } from "./Chip";
 
 type User = {
   id: string;
@@ -90,10 +91,10 @@ export const audios = {
 audios.timerClock.volume = 0.6;
 audios.dealCard.playbackRate = 2;
 
-export function App() {
+export function Room() {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const { userId, roomId } = window.server_props as { production: boolean; userId: string; roomId: string;};
+  const { userId, roomId } = window.__SERVER_PROPS__ as { production: boolean; userId: string; roomId: string;};
 
   const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [websocket, setWebsocket] = useState<WebSocket | null>(null);
@@ -142,7 +143,7 @@ export function App() {
 
             switch(data.ref) {
               case 'DEAL_CARD': {
-                audios.dealCard.play();
+                // audios.dealCard.play();
                 break;
               }
             }

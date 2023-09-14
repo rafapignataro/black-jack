@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { CHAIR_POSITIONS, ChairIndex, Player as PlayerType, audios } from "../App";
+import { CHAIR_POSITIONS, ChairIndex, Player as PlayerType, audios } from "./Room";
 import { Card } from "./Card";
 import { Chip } from "./Chip";
 import { PlayerTimer } from "./ProgressBar";

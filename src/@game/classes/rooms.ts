@@ -1,11 +1,11 @@
 import WebSocket from 'ws';
 
-import { getShuffledDeck } from "../utils/get-shuffled-deck";
 import { User } from "./users";
 import { Card } from "./card";
-import { uniqueID } from "../utils/unique-id";
-import { sleep } from "../utils/sleep";
-import { Socket, webSocketServer } from "..";
+import { webSocketServer, Socket } from '../../server';
+import { sleep } from '../../utils/sleep';
+import { uniqueID } from '../../utils/unique-id';
+import { getShuffledDeck } from '../utils/get-shuffled-deck';
 
 class Dealer {
   public id: string;
@@ -69,9 +69,7 @@ class Player {
   constructor(user: User) {
     this.id = user.id;
 
-    if (!user.roomId) return;
-
-    this.roomId = user.roomId;
+    this.roomId = String(user.roomId);
 
     this.user = user;
 
@@ -340,7 +338,10 @@ export class Room {
 
     this.emitState();
 
-    if (this.dealer.count <= 16) {
+    if (
+      this.listPlayers().find(p => p && p.status === 'IDLE') &&
+      this.dealer.count <= 16
+    ) {
       while (this.dealer.count <= 16) {
         const card = this.deck.pop() as Card;
 
@@ -433,7 +434,7 @@ export class Room {
 
     player = new Player(user);
 
-    this.players[chair] = player;
+    this.players[chair as 1 | 2 | 3 | 4 | 5 | 6] = player;
 
     if (this.status === 'IDLE') this.start();
 

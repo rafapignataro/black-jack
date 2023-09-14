@@ -4,10 +4,14 @@ import WebSocket from 'ws';
 import path from 'path';
 import fs from 'fs';
 import chalk from 'chalk';
+// import ReactDOMServer from 'react-dom/server';
 
-import { GameServer } from './models/gameServer';
+// import { App } from './App';
+
+import { GameServer } from './@game/classes/gameServer';
+import { User } from './@game/classes/users';
 import { getUserIdFromRequest } from './utils/get-player-id-from-request';
-import { User } from './models/users';
+import template from './template';
 
 export interface Socket extends WebSocket {
   userId?: string;
@@ -21,23 +25,7 @@ const server = http.createServer(app);
 export const webSocketServer = new WebSocket.Server({ server });
 const sockets = new Map<string, Socket>();
 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-
-app.use("/", express.static(path.join(__dirname, '..', "public")));
-
-const imageRegex = /\/.+\.(svg|png|jpg|png|jpeg)$/;
-const videoRegex = /\/.+\.(mp4|ogv)$/;
-  
-app.get(imageRegex, (req, res) => {
-  const filePath = req.path;
-  res.redirect(303, `http://localhost:3000/src${filePath}`);
-});
-
-app.get(videoRegex, (req, res) => {
-  const filePath = req.path;
-  res.redirect(303, `http://localhost:3000/src${filePath}`);
-});
+app.use("/", express.static(path.join(__dirname, '..', 'public')));
 
 app.get("/:roomId?", async (request, response) => {
   try {
@@ -73,7 +61,7 @@ app.get("/:roomId?", async (request, response) => {
     })();
 
     room.join(user);
-    
+
     const props = {
       production,
       roomId,
@@ -81,22 +69,28 @@ app.get("/:roomId?", async (request, response) => {
     }
 
     if (!production) {
-      return response.render("index.ejs", { 
+      return response.send(template({
+        body: '',
+        title: 'Black Jack',
         production,
         props
-      });
+      }));
     }
   
     const manifestPath = path.join(__dirname, '..', 'public', 'build', 'manifest.json')
     const manifestFile = fs.readFileSync(manifestPath);
     const manifest = JSON.parse(manifestFile as unknown as string);
-  
-    response.render("index.ejs", { 
-      app_js: `/build/${manifest['app/index.tsx'].file}`,
-      app_css: `/build/${manifest['app/index.css'].file}`,
+    
+    return response.send(template({
+      body: '',
+      title: 'Black Jack',
       production,
+      bundle: {
+        js: manifest['src/client.tsx'].file,
+        css: manifest['src/client.css'].file,
+      },
       props
-    });
+    }));
   } catch (err) {
     console.log(err)
     return response.status(500).json({ err: err.message })
