@@ -5,6 +5,7 @@ import { Dealer } from "../components/Dealer";
 import { Chair } from "../components/Chair";
 import { Chip } from "../components/Chip";
 import { useServerProps } from "../App";
+import { Minus, Plus } from "lucide-react";
 
 type User = {
   id: string;
@@ -205,9 +206,15 @@ export function Room() {
       <div className="flex flex-col w-[1024px] h-[640px]">
         <header className="w-full relative">
           <div className="flex items-center justify-between px-4 py-2 container mx-auto">
-            <div className="flex flex-col">
-              <span className="text-yellow-600 font-bold text-sm -mb-1">ROOM</span>
-              <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">#</span>{roomId}</h1>
+            <div className="flex gap-6">
+              <div className="flex flex-col">
+                <span className="text-yellow-600 font-bold text-sm -mb-1">ROOM</span>
+                <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">#</span>{roomId}</h1>
+              </div>
+              {!!roomState.spectators.length && <div className="flex flex-col">
+                <span className="text-yellow-600 font-bold text-sm -mb-1">SPECTATORS</span>
+                <p className="text-3xl font-black text-yellow-500">{roomState.spectators.length}</p>
+              </div>}
             </div>
             <div className="flex flex-col text-right">
               <span className="text-yellow-600 font-bold text-sm -mb-1">BALANCE</span>
@@ -220,23 +227,23 @@ export function Room() {
             {ROOM_STATUS_LABELS[roomState.status]} {!!roomState.startsIn && roomState.startsIn}
           </h2>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pb-4 gap-5">
-            {playerTurn && roomState.status === 'PLAYING' && <div className="flex flex-col items-center justify-center gap-4">
+            {(playerTurn && roomState.status === 'PLAYING') && <div className="flex flex-col items-center justify-center gap-4">
               <h3 className="text-2xl font-bold text-white">It's your turn!</h3>
               <div className="flex items-center gap-5">
                 <button 
-                  className="bg-emerald-500 border-2 border-emerald-600 hover:bg-emerald-600 flex flex-col items-center rounded-md text-white font-bold text-md w-20 h-14 cursor-pointer text-center"
+                  className="bg-emerald-500 border-2 border-emerald-600 hover:bg-emerald-600 flex items-center rounded-md text-white font-bold px-2 text-sm w-24 h-10 cursor-pointer text-center"
                   disabled={roomState.status !== 'PLAYING' || disableActions}
                   onClick={() => handleAction('PLAYER_HIT')}
                 >
-                  <span>+</span>
+                  <Plus className="h-4 w-4 mr-2" />
                   HIT
                 </button>
                 <button 
-                  className="bg-red-500 border-2 border-red-600 hover:bg-red-600 flex flex-col items-center rounded-md text-white font-bold text-md w-20 h-14 cursor-pointer text-center"
+                  className="bg-red-500 border-2 border-red-600 hover:bg-red-600 flex items-center rounded-md text-white font-bold px-2 text-sm w-24 h-10 cursor-pointer text-center"
                   disabled={roomState.status !== 'PLAYING' || disableActions}
                   onClick={() => handleAction('PLAYER_STAY')}
                 >
-                  <span>-</span>
+                  <Minus className="h-4 w-4 mr-2" />
                   STAND
                 </button>
               </div>
