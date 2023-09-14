@@ -142,7 +142,7 @@ export function Room() {
 
             switch(data.ref) {
               case 'DEAL_CARD': {
-                // audios.dealCard.play();
+                audios.dealCard.play();
                 break;
               }
             }
