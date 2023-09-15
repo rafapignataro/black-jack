@@ -7,7 +7,7 @@ export default defineConfig({
   build: {
     manifest: true,
     rollupOptions: {
-      input: "./src/client.tsx",
+      input: "./src/entry.client.tsx",
       output: {
         dir: 'public/build'
       },

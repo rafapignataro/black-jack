@@ -4,7 +4,7 @@ import { Player } from "../components/Player";
 import { Dealer } from "../components/Dealer";
 import { Chair } from "../components/Chair";
 import { Chip } from "../components/Chip";
-import { useServerProps } from "../App";
+import { useServerProps } from "../root";
 import { Minus, Plus } from "lucide-react";
 
 type User = {

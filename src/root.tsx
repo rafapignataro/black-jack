@@ -4,7 +4,7 @@ import { Room } from "./pages/Room";
 
 import './tailwind.css';
 
-export function App() {
+export function Root() {
   return <Room />
 }
 

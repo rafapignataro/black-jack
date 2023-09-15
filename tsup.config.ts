@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ['src/server.tsx'],
+  entry: ['src/entry.server.tsx'],
   outDir: 'build',
   clean: true,
   loader: {

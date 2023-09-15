@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 
 import { User } from "./users";
 import { Card } from "./card";
-import { webSocketServer, Socket } from '../../server';
+import { webSocketServer, Socket } from '../../entry.server';
 import { sleep } from '../../utils/sleep';
 import { uniqueID } from '../../utils/unique-id';
 import { getShuffledDeck } from '../utils/get-shuffled-deck';

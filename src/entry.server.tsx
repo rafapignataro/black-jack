@@ -88,8 +88,8 @@ app.get("/:roomId?", async (request, response) => {
       title: 'Black Jack',
       production,
       bundle: {
-        js: manifest['src/client.tsx'].file,
-        css: manifest['src/client.css'].file,
+        js: manifest['src/entry.client.tsx'].file,
+        css: manifest['src/entry.client.css'].file,
       },
       props
     }));

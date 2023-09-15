@@ -7,10 +7,10 @@
     "node": ">=18"
   },
   "scripts": {
-    "server": "tsup --watch --onSuccess \"node build/server.cjs\"",
-    "dev": "NODE_ENV=development concurrently 'vite dev' 'tsup --watch --onSuccess \"node build/server.cjs\"'",
+    "server": "tsup --watch --onSuccess \"node build/entry.server.cjs\"",
+    "dev": "NODE_ENV=development concurrently 'vite dev' 'tsup --watch --onSuccess \"node build/entry.server.cjs\"'",
     "build": "concurrently 'vite build' 'tsup'",
-    "start": "NODE_ENV=production node build/server.cjs"
+    "start": "NODE_ENV=production node build/entry.server.cjs"
   },
   "dependencies": {
     "chalk": "^4.1.2",
