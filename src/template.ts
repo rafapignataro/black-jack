@@ -1,5 +1,5 @@
 type TemplateProps = {
-  body: string;
+  body?: string;
   title: string;
   production: boolean;
   bundle?: {
@@ -9,7 +9,7 @@ type TemplateProps = {
   props?: Record<string, unknown>;
 }
 
-export default function template({ body, title, production, bundle, props }: TemplateProps) {
+export default function template({ body = '', title, production, bundle, props }: TemplateProps) {
   return `
     <!DOCTYPE html>
     <html>

@@ -72,19 +72,17 @@ app.get("/:roomId?", async (request, response) => {
 
     if (!production) {
       return response.send(template({
-        body: '',
         title: 'Black Jack',
         production,
         props
       }));
     }
   
-    const manifestPath = path.join(__dirname, '..', 'public', 'build', 'manifest.json')
+    const manifestPath = path.join(__dirname, '..', 'public', 'build', 'manifest.json');
     const manifestFile = fs.readFileSync(manifestPath);
     const manifest = JSON.parse(manifestFile as unknown as string);
     
     return response.send(template({
-      body: '',
       title: 'Black Jack',
       production,
       bundle: {
