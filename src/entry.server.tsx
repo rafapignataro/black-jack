@@ -4,6 +4,7 @@ import WebSocket from 'ws';
 import path from 'path';
 import fs from 'fs';
 import chalk from 'chalk';
+import bodyParser from 'body-parser';
 // import ReactDOMServer from 'react-dom/server';
 
 // import { App } from './App';
@@ -26,11 +27,11 @@ export const webSocketServer = new WebSocket.Server({ server });
 const sockets = new Map<string, Socket>();
 
 app.use("/", express.static(path.join(__dirname, '..', 'public')));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/:roomId?", async (request, response) => {
   try {
     const production = process.env.NODE_ENV === 'production';
-    const userId = getUserIdFromRequest(request);
     const roomId = request.params.roomId;
 
     if (!roomId) {
@@ -43,29 +44,14 @@ app.get("/:roomId?", async (request, response) => {
 
     if (!room) return response.redirect('/');
 
-    const user = (() => {
-      if (!userId || !gameServer.users.find(userId)) {
-        const user = gameServer.users.create();
-        
-        console.info(chalk.green('NEW USER CREATED: '), user.id);
+    let userId = getUserIdFromRequest(request);
 
-        response.cookie('_id_', user.id, {
-          maxAge: 1000 * 60 * 60 * 24 * 365, // 1 Year,
-          httpOnly: true,
-          sameSite: true,
-        })
-        return user;
-      }
-
-      return gameServer.users.find(userId) as User;
-    })();
-
-    room.join(user);
+    userId = userId ? gameServer.users.find(userId)?.id || null : null;
 
     const props = {
       production,
       roomId,
-      userId: user.id
+      userId
     }
 
     response.setHeader('Content-Type', 'text/html')
@@ -91,15 +77,15 @@ app.get("/:roomId?", async (request, response) => {
       },
       props
     }));
-  } catch (err) {
+  } catch (err: unknown) {
     console.log(err)
-    return response.status(500).json({ err: err.message })
+    return response.status(500).json({ err: (err as Error).message })
   }
 });
 
 webSocketServer.on('connection', (socket: Socket, request: Request) => {
   const userId = getUserIdFromRequest(request);
-  if (!userId) return;
+  if (!userId) return ;
   
   const user = gameServer.users.find(userId);
   if (!user) return;
@@ -163,11 +149,45 @@ webSocketServer.on('connection', (socket: Socket, request: Request) => {
   socket.on('close', () => {
     user.disconnect();
 
-    sockets.set(user.id, socket);
+    sockets.delete(user.id);
 
     room.emitState();
   });
 });
+
+app.post('/join-room', (request, response) => {
+  const userId = getUserIdFromRequest(request);
+  const { name, avatar, roomId } = request.body;
+
+  const room = gameServer.rooms.find(roomId);
+
+  if (!room) return response.redirect('/');
+
+  const user = userId ? gameServer.users.find(userId) : null;
+
+  if (!user) {
+    const user = gameServer.users.create(name, avatar);
+
+    console.info(chalk.green('NEW USER CREATED: '), user.id);
+
+    response.cookie('_id_', user.id, {
+      maxAge: 1000 * 60 * 60 * 24 * 365, // 1 Year,
+      httpOnly: true,
+      sameSite: true,
+    });
+
+    room.join(user);
+
+    response.redirect('/' + roomId);
+    return;
+  }
+
+  if (user.roomId == roomId) return response.end();
+
+  room.join(user);
+
+  response.redirect('/' + roomId);
+})
 
 // app.post('/rooms', (request, response) => {
 //   const userId = getUserIdFromRequest(request);

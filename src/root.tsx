@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 
 import { Room } from "./pages/Room";
+import { Join } from "./pages/Join";
 
 import './tailwind.css';
 
 export function Root() {
+  const { userId } = useServerProps<{ userId?: string; }>();
+
+  if (!userId) return <Join />
+
   return <Room />
 }
 

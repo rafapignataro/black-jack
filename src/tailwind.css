@@ -6,6 +6,7 @@ body {
   background-color: #5F3610;
   opacity: 1;
   background: repeating-linear-gradient( 45deg, #704013, #704013 9.5px, #5F3610 9.5px, #5F3610 47.5px );
+  height: 100vh;
 }
 
 .card-back {

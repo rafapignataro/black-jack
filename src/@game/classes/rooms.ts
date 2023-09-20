@@ -271,7 +271,6 @@ export class Room {
 
       const receiver = receivers[playerToDeal];
 
-      console.log(card)
       receiver.dealCard(card);
 
       this.emitState('DEAL_CARD');

@@ -13,18 +13,6 @@ type PlayerProps = {
 }
 
 export function Player({ player, isUser, chair, turnPlayer, turnEndsIn }: PlayerProps) {
-  const style = (() => {
-    if (isUser) return 'bg-red-600 border-red-900';
-
-    return 'bg-emerald-600 border-emerald-900';
-  })();
-
-  const label = (() => {
-    if (isUser) return 'YOU';
-
-    return `Player ${chair}`;
-  })();
-
   const position = CHAIR_POSITIONS[chair];
 
   useEffect(() => {
@@ -38,7 +26,7 @@ export function Player({ player, isUser, chair, turnPlayer, turnEndsIn }: Player
 
   return (
     <div 
-      className={`absolute flex justify-center items-center rounded-full w-24 h-24 border-4 ${style} `}
+      className={`absolute flex justify-center items-center rounded-full w-24 h-24 border-8 border-yellow-950`}
       style={{
         top: position.top, 
         bottom: position.bottom, 
@@ -47,8 +35,11 @@ export function Player({ player, isUser, chair, turnPlayer, turnEndsIn }: Player
         transform: `translate(${position.x}, ${position.y})`
       }}
     >
-      <span className="font-bold text-white text-sm">
-        {label}
+      <div className="-z-10 absolute top-0 left-0 rounded-full w-full h-full overflow-hidden">
+        <img src={`/avatars/${player.user.avatar}`} alt="User avatar" />
+      </div>
+      <span className="absolute left-1/2 bottom-0 -translate-x-1/2 -translate-y-1/2 font-bold text-white text-sm">
+        {player.user.name}
       </span>
       <div className="absolute -bottom-1/2 left-1/3 flex items-end gap-4">
         {!!player.count && <span className="text-sm font-bold text-white">{player.count}</span>}
@@ -56,11 +47,11 @@ export function Player({ player, isUser, chair, turnPlayer, turnEndsIn }: Player
           {player.cards.map((card, index) => <Card key={`${card.label}_${card.suit}`} card={card} index={index} />)}
         </div>
       </div>
-      {turnPlayer && (
+      {/* {turnPlayer && (
         <div className="absolute left-1/2 top-1/4 -translate-x-1/2 -translate-y-1/2 text-white text-lg font-bold">
           {turnEndsIn}
         </div>
-      )}
+      )} */}
       {!!player.bet && (
         <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[150%]">
           <Chip value={player.bet} />

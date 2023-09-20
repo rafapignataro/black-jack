@@ -9,6 +9,8 @@ import { Minus, Plus } from "lucide-react";
 
 type User = {
   id: string;
+  name: string;
+  avatar: string;
   roomId?: string
   online: boolean;
   isPlaying: boolean;
@@ -94,12 +96,14 @@ audios.timerClock.volume = 0.6;
 audios.dealCard.playbackRate = 2;
 
 export function Room() {
-  const { userId, roomId } = useServerProps<{ production: boolean; userId: string; roomId: string; }>();
+  const { userId, roomId } = useServerProps<{ production: boolean; userId?: string; roomId: string; }>();
 
   const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [websocket, setWebsocket] = useState<WebSocket | null>(null);
 
   const user = (() => {
+    if (!userId) return null;
+    
     if (!roomState) return null;
 
     const player = roomState.players.find(p => p && p.id === userId);
@@ -202,10 +206,10 @@ export function Room() {
   const playerTurn = roomState.turnPlayer?.id === user?.id;
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen w-full">
+    <div className="flex flex-col justify-center items-center h-screen w-full relative">
       <div className="flex flex-col w-[1024px] h-[640px]">
         <header className="w-full relative">
-          <div className="flex items-center justify-between px-4 py-2 container mx-auto">
+          <div className="flex items-center justify-between px-6 py-2 container mx-auto">
             <div className="flex gap-6">
               <div className="flex flex-col">
                 <span className="text-yellow-600 font-bold text-sm -mb-1">ROOM</span>
@@ -216,9 +220,14 @@ export function Room() {
                 <p className="text-3xl font-black text-yellow-500">{roomState.spectators.length}</p>
               </div>}
             </div>
-            <div className="flex flex-col text-right">
-              <span className="text-yellow-600 font-bold text-sm -mb-1">BALANCE</span>
-              <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">$</span>{Number(user?.balance).toFixed(2)}</h1>
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col text-right">
+                <span className="text-yellow-600 font-bold text-sm -mb-1">BALANCE</span>
+                <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">$</span>{Number(user?.balance).toFixed(2)}</h1>
+              </div>
+              <div className="h-14 w-14 rounded-full bg-yellow-950 overflow-hidden  border-4 border-yellow-950">
+                <img src={'/avatars/' + user?.avatar} alt="User avatar" className="" />
+              </div>
             </div>
           </div>
         </header>

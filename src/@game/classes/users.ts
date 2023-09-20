@@ -3,14 +3,22 @@ export class User {
 
   public roomId?: string;
 
+  public name: string;
+
+  public avatar: string;
+
   public online: boolean;
 
   public isPlaying: boolean;
 
   public balance: number;
 
-  constructor() {
+  constructor(name: string, avatar: string) {
     this.id = crypto.randomUUID();
+
+    this.name = name;
+
+    this.avatar = avatar;
 
     this.online = false;
 
@@ -43,8 +51,8 @@ export class Users {
     return Array.from(this.users.values());
   }
 
-  create() {
-    const user = new User();
+  create(name: string, avatar: string) {
+    const user = new User(name, avatar);
 
     this.users.set(user.id, user);
 
