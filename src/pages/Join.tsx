@@ -26,7 +26,7 @@ export function Join() {
         <div className="flex flex-col gap-3">
           <label htmlFor="name" className="font-bold text-yellow-700">Avatar</label>
           <div className="grid grid-cols-3 gap-6">
-            <AvatarInput index={1} isSelected={selectedAvatar === 1} onSelect={() => setSelectedAvatar(1)} />
+            <AvatarInput index={1} isSelected={selectedAvatar === 1} onSelect={() => setSelectedAvatar(1)} defaultChecked />
             <AvatarInput index={2} isSelected={selectedAvatar === 2} onSelect={() => setSelectedAvatar(2)} />
             <AvatarInput index={3} isSelected={selectedAvatar === 3} onSelect={() => setSelectedAvatar(3)} />
             <AvatarInput index={4} isSelected={selectedAvatar === 4} onSelect={() => setSelectedAvatar(4)} />
