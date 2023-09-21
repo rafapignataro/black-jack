@@ -10,7 +10,7 @@ export function Join() {
   return (
     <div className="absolute top-0 left-0 z-50 h-screen w-screen flex items-center justify-center">
       <form method="POST" action="/join-room" className="w-full max-w-md rounded-md p-4 bg-yellow-950 flex flex-col gap-4">
-        <h1 className="text-2xl font-bold text-yellow-600">Welcome</h1>
+        <h1 className="text-2xl font-bold text-yellow-600">Joining room <span className="font-black text-yellow-500">#{roomId}</span></h1>
         <input type="hidden" name="roomId" value={roomId} />
         <div className="flex flex-col gap-1">
           <label htmlFor="name" className="font-bold text-yellow-700">Name</label>

@@ -67,12 +67,12 @@ type ChairPosition = {
 }
 
 export const CHAIR_POSITIONS: Record<ChairIndex, ChairPosition> = {
-  1: { top: '50%', left: 0, x: '-75%', y: '-50%' },
+  1: { top: '50%', left: 0, x: '-60%', y: '-50%' },
   2: { bottom: '15%', left: 0, x: '50%', y: '50%' },
   3: { bottom: 0, right: '50%', x: '-100%', y: '50%' },
   4: { bottom: 0, left: '50%', x: '100%', y: '50%' },
   5: { bottom: '15%', right: 0, x: '-50%', y: '50%' },
-  6: { top: '50%', right: 0, x: '75%', y: '-50%' },
+  6: { top: '50%', right: 0, x: '60%', y: '-50%' },
 };
 
 const ROOM_STATUS_LABELS: Record<RoomState['status'], string>  = {
@@ -206,14 +206,14 @@ export function Room() {
   const playerTurn = roomState.turnPlayer?.id === user?.id;
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen w-full relative">
-      <div className="flex flex-col w-[1024px] h-[640px]">
+    <div className="flex flex-col justify-center items-center h-screen w-full relative overflow-hidden">
+      <div className="flex flex-col w-full lg:w-[1024px] h-[640px] px-12 py-4">
         <header className="w-full relative">
-          <div className="flex items-center justify-between px-6 py-2 container mx-auto">
+          <div className="w-full flex items-center justify-between px-6 py-2">
             <div className="flex gap-6">
               <div className="flex flex-col">
                 <span className="text-yellow-600 font-bold text-sm -mb-1">ROOM</span>
-                <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">#</span>{roomId}</h1>
+                <h1 className="text-xl md:text-3xl font-black text-yellow-500"><span className="select-none">#</span>{roomId}</h1>
               </div>
               {!!roomState.spectators.length && <div className="flex flex-col">
                 <span className="text-yellow-600 font-bold text-sm -mb-1">SPECTATORS</span>
@@ -223,62 +223,65 @@ export function Room() {
             <div className="flex items-center gap-3">
               <div className="flex flex-col text-right">
                 <span className="text-yellow-600 font-bold text-sm -mb-1">BALANCE</span>
-                <h1 className="text-3xl font-black text-yellow-500"><span className="select-none">$</span>{Number(user?.balance).toFixed(2)}</h1>
+                <h1 className="text-xl md:text-3xl font-black text-yellow-500"><span className="select-none">$</span>{Number(user?.balance).toFixed(2)}</h1>
               </div>
-              <div className="h-14 w-14 rounded-full bg-yellow-950 overflow-hidden  border-4 border-yellow-950">
+              <div className="h-10 w-10 md:h-14 md:w-14 rounded-full bg-yellow-950 overflow-hidden  border-4 border-yellow-950">
                 <img src={'/avatars/' + user?.avatar} alt="User avatar" className="" />
               </div>
             </div>
           </div>
         </header>
-        <div id="table" className="bg-green-900 shadow-2xl h-full w-full border-[24px] rounded-[32px] rounded-bl-[50%] rounded-br-[50%] border-yellow-950 relative">
-          <h2 className="z-40 absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-3xl text-center">
-            {ROOM_STATUS_LABELS[roomState.status]} {!!roomState.startsIn && roomState.startsIn}
-          </h2>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pb-4 gap-5">
-            {(playerTurn && roomState.status === 'PLAYING') && <div className="flex flex-col items-center justify-center gap-4">
-              <h3 className="text-2xl font-bold text-white">It's your turn!</h3>
-              <div className="flex items-center gap-5">
-                <button 
-                  className="bg-emerald-500 border-2 border-emerald-600 hover:bg-emerald-600 flex items-center rounded-md text-white font-bold px-2 text-sm w-24 h-10 cursor-pointer text-center"
-                  disabled={roomState.status !== 'PLAYING' || disableActions}
-                  onClick={() => handleAction('PLAYER_HIT')}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  HIT
-                </button>
-                <button 
-                  className="bg-red-500 border-2 border-red-600 hover:bg-red-600 flex items-center rounded-md text-white font-bold px-2 text-sm w-24 h-10 cursor-pointer text-center"
-                  disabled={roomState.status !== 'PLAYING' || disableActions}
-                  onClick={() => handleAction('PLAYER_STAY')}
-                >
-                  <Minus className="h-4 w-4 mr-2" />
-                  STAND
-                </button>
-              </div>
-            </div>}
-            {playerTurn && roomState.status === 'BETTING' && <div className="flex flex-col items-center justify-center gap-4">
-              <h3 className="text-2xl font-bold text-white">Your turn to bet!</h3>
-              <div className="flex items-center gap-5">
-                <Chip value={25} onBet={handleBet} />
-                <Chip value={50} onBet={handleBet} />
-                <Chip value={100} onBet={handleBet} />
-                <Chip value={500} onBet={handleBet} />
-              </div>
-            </div>}
+        <div className="table-container h-full w-full">
+          <div id="table" className="bg-green-900 shadow-2xl h-full w-full border-[16px] lg :border-[24px] rounded-[32px] rounded-bl-[50%] rounded-br-[50%] border-yellow-950 relative">
+            <h2 className="z-40 absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-3xl text-center">
+              {ROOM_STATUS_LABELS[roomState.status]} {!!roomState.startsIn && roomState.startsIn}
+            </h2>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pb-4 gap-5">
+              {(playerTurn && roomState.status === 'PLAYING') && <div className="flex flex-col items-center justify-center gap-4">
+                <h3 className="text-2xl font-bold text-white">It's your turn!</h3>
+                <div className="flex items-center gap-5">
+                  <button 
+                    className="bg-emerald-500 border-2 border-emerald-600 hover:bg-emerald-600 flex items-center rounded-md text-white font-bold px-2 text-sm w-24 h-10 cursor-pointer text-center"
+                    disabled={roomState.status !== 'PLAYING' || disableActions}
+                    onClick={() => handleAction('PLAYER_HIT')}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    HIT
+                  </button>
+                  <button 
+                    className="bg-red-500 border-2 border-red-600 hover:bg-red-600 flex items-center rounded-md text-white font-bold px-2 text-sm w-24 h-10 cursor-pointer text-center"
+                    disabled={roomState.status !== 'PLAYING' || disableActions}
+                    onClick={() => handleAction('PLAYER_STAY')}
+                  >
+                    <Minus className="h-4 w-4 mr-2" />
+                    STAND
+                  </button>
+                </div>
+              </div>}
+              {playerTurn && roomState.status === 'BETTING' && <div className="flex flex-col items-center justify-center gap-4">
+                <h3 className="text-2xl font-bold text-white">Your turn to bet!</h3>
+                <div className="flex items-center gap-5">
+                  <Chip value={25} onBet={handleBet} />
+                  <Chip value={50} onBet={handleBet} />
+                  <Chip value={100} onBet={handleBet} />
+                  <Chip value={500} onBet={handleBet} />
+                </div>
+              </div>}
+            </div>
+            <Dealer dealer={roomState.dealer} />
+            {roomState.players && roomState.players.map((player, chair) => player ? (
+              <Player 
+                key={player.id} 
+                player={player} 
+                isUser={player.id === user?.id} 
+                chair={chair + 1 as 1 | 2 | 3 | 4 | 5 | 6}
+                turnPlayer={roomState.turnPlayer?.id === player.id ? roomState.turnPlayer : undefined}
+                turnEndsIn={roomState.turnPlayer?.id === player.id ? roomState.turnEndsIn : undefined}
+              />
+            ) : <Chair key={`chair_${chair}`} chair={chair + 1 as ChairIndex} onPick={onPickChair} disabled={user?.isPlaying} /> )}
           </div>
-          <Dealer dealer={roomState.dealer} />
-          {roomState.players && roomState.players.map((player, chair) => player ? (
-            <Player 
-              key={player.id} 
-              player={player} 
-              isUser={player.id === user?.id} 
-              chair={chair + 1 as 1 | 2 | 3 | 4 | 5 | 6}
-              turnPlayer={roomState.turnPlayer?.id === player.id ? roomState.turnPlayer : undefined}
-              turnEndsIn={roomState.turnPlayer?.id === player.id ? roomState.turnEndsIn : undefined}
-            />
-          ) : <Chair key={`chair_${chair}`} chair={chair + 1 as ChairIndex} onPick={onPickChair} disabled={user?.isPlaying} /> )}
         </div>
+
       </div>
       
     </div>
