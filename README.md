@@ -2,6 +2,8 @@
 
 A Multiplayer Black Jack game. Join rooms, play with other players and enjoy!
 
+![Game](/demo.gif "Game") 
+
 ## Technologies
 
 - Typescript
