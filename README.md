@@ -13,12 +13,6 @@ A Multiplayer Black Jack game. Join rooms, play with other players and enjoy!
 - Websockets
 - Tailwind
 
-## Features
+## About
 
-- [x] Core Black Jack game logic
-- [x] Join or create room by URL
-- [ ] Screen for create or join room
-- [ ] Card "A" value 1 or 10
-- [ ] Show spectators
-- [ ] Room Chat
-- [ ] Player bets
+This game was an experience trying to build a multiplayer game with websockets, Vite and Express all in the same project like a fullstack framework but from scratch.
